@@ -1,0 +1,14 @@
+{
+	"name": "VectorSprite",
+	"license": "MIT",
+	"tags": [
+		"game"
+	],
+	"classPath": "src",
+	"description": "Sprite for easy creation of vector drawing",
+	"contributors": [
+		"grabli66"
+	],	
+	"version": "0.1.0",
+	"url": "https://github.com/Grabli66/VectorSprite"
+}
