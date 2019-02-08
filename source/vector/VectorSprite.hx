@@ -137,7 +137,7 @@ class VectorSprite extends FlxSprite {
 		var text = elem.att.text;
 		var flText = new FlxText();
 		flText.text = text;
-        flText.setFormat(null, size, FlxColor.GREEN);		
+        flText.setFormat(null, size, color);		
         flText.drawFrame(true);		
 		var matrix = new FlxMatrix();
 		matrix.identity();

@@ -24,7 +24,7 @@ class TestState extends FlxState
 				<ellipse x="31" y="53" width="50" height="30" brush="grey" />
 				<ellipse x="30" y="50" width="50" height="30" brush="green" />
 				<ellipse x="35" y="55" width="45" height="25" brush="grey" />			
-				<text x="10" y="20" size="12" color="00FF33" text="Hello world" />
+				<text x="10" y="20" size="12" color="0033FF" text="Hello world" />
 			</sprite>
 		');
 				
