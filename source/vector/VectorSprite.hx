@@ -1,5 +1,6 @@
 package vector;
 
+import flixel.math.FlxMatrix;
 import flixel.text.FlxText;
 import flixel.FlxSprite;
 import flixel.util.FlxColor;
@@ -134,10 +135,14 @@ class VectorSprite extends FlxSprite {
             color = Std.parseInt("0x" + elem.att.color);        
 
 		var text = elem.att.text;
-		var flText = new FlxText(x, y, 0, text);
-        flText.setFormat(null, size, FlxColor.GREEN);
-        flText.drawFrame(true);
-		pixels.draw(flText.pixels);
+		var flText = new FlxText();
+		flText.text = text;
+        flText.setFormat(null, size, FlxColor.GREEN);		
+        flText.drawFrame(true);		
+		var matrix = new FlxMatrix();
+		matrix.identity();
+		matrix.translate(x, y);
+		pixels.draw(flText.pixels, matrix);
 	}
 
 	/**

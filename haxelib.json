@@ -4,7 +4,7 @@
 	"tags": [
 		"game"
 	],
-	"classPath": "src",
+	"classPath": "source",
 	"description": "Sprite for easy creation of vector drawing",
 	"contributors": [
 		"grabli66"
