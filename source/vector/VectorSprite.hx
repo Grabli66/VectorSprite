@@ -13,14 +13,19 @@ class VectorSprite extends FlxSprite {
 	public inline static final ALPHA_SCALE = 255;
 
 	/**
-	 * Sprite xml data
-	 */
-	var xml:Access;
-
-	/**
 	 * Registered brushes
 	 */
 	var brushes = new Map<String, Brush>();
+
+	/**
+	 * Parsed frame nodes
+	 */
+	var frameNodes = new Array<FrameNode>();
+
+	/**
+	 * Name of sprite
+	 */
+	public var name(default, null):String;
 
 	/**
 	 * Apply brush for drawing if it exists and is not current (TODO)
@@ -125,20 +130,20 @@ class VectorSprite extends FlxSprite {
 	function createText(elem:haxe.xml.Access) {
 		var x = Std.parseInt(elem.att.x);
 		var y = Std.parseInt(elem.att.y);
-        var size = 8;
-        var color = 0xFFFFFF;
+		var size = 8;
+		var color = 0xFFFFFF;
 
-        if (elem.has.size)
-            size = Std.parseInt(elem.att.size);
+		if (elem.has.size)
+			size = Std.parseInt(elem.att.size);
 
-        if (elem.has.color)
-            color = Std.parseInt("0x" + elem.att.color);        
+		if (elem.has.color)
+			color = Std.parseInt("0x" + elem.att.color);
 
 		var text = elem.att.text;
 		var flText = new FlxText();
 		flText.text = text;
-        flText.setFormat(null, size, color);		
-        flText.drawFrame(true);		
+		flText.setFormat(null, size, color);
+		flText.drawFrame(true);
 		var matrix = new FlxMatrix();
 		matrix.identity();
 		matrix.translate(x, y);
@@ -146,9 +151,22 @@ class VectorSprite extends FlxSprite {
 	}
 
 	/**
-	 * Create brush
+	 * Create and append frame
+	 * @param elem
 	 */
-	function createBrush(elem:haxe.xml.Access) {
+	function createFrame(elem:haxe.xml.Access) {}
+
+	/**
+	 * Redraw sprite
+	 */
+	function redraw() {		
+		makeGraphic(Math.round(width), Math.round(height), FlxColor.TRANSPARENT);
+	}
+
+	/**
+	 * Parse brush	 
+	 */
+	function parseBrush(elem:haxe.xml.Access) {
 		var name = elem.att.name;
 		var color = Std.parseInt("0x" + elem.att.color);
 		var brush:Brush = {
@@ -160,15 +178,12 @@ class VectorSprite extends FlxSprite {
 		brushes[name] = brush;
 	}
 
-	function redraw() {
-		var width = Std.parseInt(xml.node.sprite.att.width);
-		var height = Std.parseInt(xml.node.sprite.att.height);
-		makeGraphic(width, height, FlxColor.TRANSPARENT);
-
-		for (elem in xml.node.sprite.elements) {
-			switch elem.name {
-				case "brush":
-					createBrush(elem);
+	/**
+	 * Parse frame
+	 */
+	function parseFrame(elem:haxe.xml.Access) {
+		for (nod in elem.elements) {
+			switch nod.name {
 				case "rect":
 					createRect(elem);
 				case "circle":
@@ -178,7 +193,30 @@ class VectorSprite extends FlxSprite {
 				case "path":
 					createPath(elem);
 				case "text":
-					createText(elem);
+					createText(elem); 
+			}
+		}
+
+		var node:FrameNode = {
+			items: []
+		};
+	}
+
+	/**
+	 * Parse xml to nodes
+	 */
+	function parseXml(xml:Access) {
+		width = Std.parseInt(xml.node.sprite.att.width);
+		height = Std.parseInt(xml.node.sprite.att.height);
+		if (xml.node.sprite.has.name)
+			name = xml.node.sprite.att.name;
+
+		for (elem in xml.node.sprite.elements) {
+			switch elem.name {
+				case "brush":
+					parseBrush(elem);
+				case "frame":
+					parseFrame(elem);
 			}
 		}
 	}
@@ -188,8 +226,8 @@ class VectorSprite extends FlxSprite {
 	 */
 	public function new(text:String) {
 		super();
-		xml = new haxe.xml.Access(Xml.parse(text));
-
+		var xml = new haxe.xml.Access(Xml.parse(text));
+		parseXml(xml);
 		redraw();
 	}
 }
