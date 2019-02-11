@@ -1,5 +1,7 @@
 package vector;
 
+import vector.FrameNode.PathCommand;
+import vector.FrameNode.FrameItem;
 import flixel.math.FlxMatrix;
 import flixel.text.FlxText;
 import flixel.FlxSprite;
@@ -151,20 +153,32 @@ class VectorSprite extends FlxSprite {
 	}
 
 	/**
-	 * Create and append frame
-	 * @param elem
+	 * Draw frame node	 
 	 */
-	function createFrame(elem:haxe.xml.Access) {}
+	function drawFrameNode(node:FrameNode) {
+		for (item in node.items) {
+			switch item {
+				case Rect(x, y, width, height):
+					drawRect(x, y, width, height);
+			}
+		}
+	}	
 
 	/**
 	 * Redraw sprite
 	 */
-	function redraw() {		
-		makeGraphic(Math.round(width), Math.round(height), FlxColor.TRANSPARENT);
+	function redraw() {
+		// Create graphic for frames
+		var w = frameNodes.length * Math.round(width);
+		makeGraphic(w, Math.round(height), FlxColor.TRANSPARENT);
+
+		for (frm in frameNodes) {
+			drawFrameNode(frm);
+		}
 	}
 
 	/**
-	 * Parse brush	 
+	 * Parse brush
 	 */
 	function parseBrush(elem:haxe.xml.Access) {
 		var name = elem.att.name;
@@ -179,27 +193,123 @@ class VectorSprite extends FlxSprite {
 	}
 
 	/**
+	 * Parse rect
+	 */
+	function parseRect(elem:haxe.xml.Access):FrameItem {
+		var x = Std.parseInt(elem.att.x);
+		var y = Std.parseInt(elem.att.y);
+		var width = Std.parseInt(elem.att.width);
+		var height = Std.parseInt(elem.att.height);
+		return FrameItem.Rect(x, y, width, height);
+	}
+
+	/**
+	 * Parse circle
+	 */
+	function parseCircle(elem:haxe.xml.Access):FrameItem {
+		var x = Std.parseInt(elem.att.x);
+		var y = Std.parseInt(elem.att.y);
+		var radius = Std.parseInt(elem.att.radius);
+		return FrameItem.Circle(x, y, radius);
+	}
+
+	/**
+	 * Parse ellipse
+	 */
+	function parseEllipse(elem:haxe.xml.Access):FrameItem {
+		var x = Std.parseInt(elem.att.x);
+		var y = Std.parseInt(elem.att.y);
+		var width = Std.parseInt(elem.att.width);
+		var height = Std.parseInt(elem.att.height);
+		return FrameItem.Ellipse(x, y, width, height);
+	}
+
+	/**
+	 * Create path
+	 */
+	function parsePath(elem:haxe.xml.Access):FrameItem {
+		var data = elem.att.data;
+		var items = data.split(" ");
+
+		var commands:Array<PathCommand> = [];
+
+		for (item in items) {
+			var points = item.split(",");
+			var first = points[0];
+			var tp = first.charAt(0); // type of curve
+			switch tp {
+				case "m":
+					var x = Std.parseInt(first.substr(1, first.length));
+					var y = Std.parseInt(points[1]);
+					commands.push(PathCommand.MoveTo(x, y));
+				case "l":
+					var x = Std.parseInt(first.substr(1, first.length));
+					var y = Std.parseInt(points[1]);
+					commands.push(PathCommand.LineTo(x, y));
+				case "q":
+					var cx = Std.parseInt(first.substr(1, first.length));
+					var cy = Std.parseInt(points[1]);
+					var ax = Std.parseInt(points[2]);
+					var ay = Std.parseInt(points[3]);
+					commands.push(PathCommand.QuadricCurveTo(cx, cy, ax, ay));
+				case "c":
+					var cx = Std.parseInt(first.substr(1, first.length));
+					var cy = Std.parseInt(points[1]);
+					var cx1 = Std.parseInt(points[2]);
+					var cy1 = Std.parseInt(points[3]);
+					var ax = Std.parseInt(points[4]);
+					var ay = Std.parseInt(points[5]);
+					commands.push(PathCommand.CubicCurveTo(cx, cy, cx1, cy1, ax, ay));
+			}
+		}
+
+		return FrameItem.Path(commands);
+	}
+
+	/**
+	 * Parse text
+	 */
+	function parseText(elem:haxe.xml.Access) {
+		var x = Std.parseInt(elem.att.x);
+		var y = Std.parseInt(elem.att.y);
+		var text = elem.att.text;
+		var size = 8;
+		var color = 0xFFFFFF;
+
+		if (elem.has.size)
+			size = Std.parseInt(elem.att.size);
+
+		if (elem.has.color)
+			color = Std.parseInt("0x" + elem.att.color);
+
+		return FrameItem.Text(x, y, text, color, size);
+	}
+
+	/**
 	 * Parse frame
 	 */
 	function parseFrame(elem:haxe.xml.Access) {
+		var items:Array<FrameItem> = [];
 		for (nod in elem.elements) {
 			switch nod.name {
 				case "rect":
-					createRect(elem);
+					items.push(parseRect(elem));
 				case "circle":
-					createCircle(elem);
+					items.push(parseCircle(elem));
 				case "ellipse":
-					createEllipse(elem);
+					items.push(parseEllipse(elem));
 				case "path":
-					createPath(elem);
+					items.push(parsePath(elem));
 				case "text":
-					createText(elem); 
+					items.push(parseText(elem));
 			}
 		}
 
 		var node:FrameNode = {
-			items: []
+			items: items
 		};
+
+		return node;
 	}
 
 	/**
@@ -216,7 +326,7 @@ class VectorSprite extends FlxSprite {
 				case "brush":
 					parseBrush(elem);
 				case "frame":
-					parseFrame(elem);
+					frameNodes.push(parseFrame(elem));
 			}
 		}
 	}
