@@ -14,10 +14,10 @@ enum PathCommand {
  * Frame item
  */
 enum FrameItem {
-	Circle(x:Int, y:Int, radius:Int);
-	Rect(x:Int, y:Int, width:Int, height:Int);
-	Ellipse(x:Int, y:Int, width:Int, height:Int);
-	Path(commands:Array<PathCommand>);
+	Circle(x:Int, y:Int, radius:Int, brush:String);
+	Rect(x:Int, y:Int, width:Int, height:Int, brush:String);
+	Ellipse(x:Int, y:Int, width:Int, height:Int, brush:String);
+	Path(commands:Array<PathCommand>, brush:String);
 	Text(x:Int, y:Int, text:String, color:Int, size:Int);
 }
 
