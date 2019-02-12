@@ -14,16 +14,19 @@ class TestState extends FlxState
 		super.create();
 
 		sprite = new vector.VectorSprite('
-			<sprite name="simple" width="100" height="100">			
+			<sprite name="simple" width="100" height="40">
 				<brush name="red" color="FFFF0033" />
-				<brush name="blue" color="FFAA0033" />				
-				<brush name="green" color="FF00FF33" />
+				<brush name="blue" color="FF0033FF" />				
+				<brush name="green" color="FF00EE33" />
+				<brush name="green2" color="FF00AA00" />
 				<brush name="grey" color="33000000" />
 				<frame>
-					<circle x="50" y="50" radius="50" brush="red" />
+					<rect x="0" y="0" width="100" height="36" brush="green" />					
+					<rect x="0" y="36" width="100" height="4" brush="green2" />
+					<text x="0" y="0" text="Click!" color="FFFFFF" size="8" />
 				</frame>
 				<frame>
-					<circle x="50" y="50" radius="50" brush="blue" />
+					<rect x="0" y="0" width="100" height="40" brush="green" />
 				</frame>
 			</sprite>
 		');
@@ -33,7 +36,7 @@ class TestState extends FlxState
 		sprite.y = 300;
 		sprite.antialiasing = true;
 		
-		sprite.scale.set(2,2);		
+		//sprite.scale.set(2,2);		
 	}
 
 	/**
@@ -42,6 +45,6 @@ class TestState extends FlxState
 	override public function update(elapsed:Float):Void
 	{		
 		super.update(elapsed);
-		sprite.angle += 2 * elapsed;
+		//sprite.angle += 2 * elapsed;
 	}
 }

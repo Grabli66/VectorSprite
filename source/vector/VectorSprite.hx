@@ -1,5 +1,11 @@
 package vector;
 
+import flixel.graphics.frames.FlxTileFrames;
+import flixel.math.FlxPoint;
+import openfl.geom.Point;
+import openfl.display.BitmapData;
+import flixel.graphics.FlxGraphic;
+import flixel.FlxG;
 import flixel.math.FlxRect;
 import vector.FrameNode.PathCommand;
 import vector.FrameNode.FrameItem;
@@ -44,8 +50,6 @@ class VectorSprite extends FlxSprite {
 	 * Draw rect
 	 */
 	function drawRect(x:Int, y:Int, width:Int, height:Int) {
-		// applyBrush(elem.att.brush);
-
 		DrawHelper.drawRect(x, y, width, height);
 		DrawHelper.endFill();
 		DrawHelper.commit(this);
@@ -107,15 +111,15 @@ class VectorSprite extends FlxSprite {
 	/**
 	 * Draw frame node
 	 */
-	function drawFrameNode(node:FrameNode) {
+	function drawFrameNode(node:FrameNode, offset:Point) {
 		for (item in node.items) {
 			switch item {
 				case Rect(x, y, width, height, brush):
 					applyBrush(brush);
-					drawRect(x, y, width, height);
+					drawRect(Math.round(x + offset.x), Math.round(y + offset.y), width, height);
 				case Circle(x, y, radius, brush):
 					applyBrush(brush);
-					drawCircle(x, y, radius);
+					drawCircle(Math.round(x + offset.x), Math.round(y + offset.y), radius);
 				case Ellipse(x, y, width, height, brush):
 					applyBrush(brush);
 					drawEllipse(x, y, width, height);
@@ -123,7 +127,7 @@ class VectorSprite extends FlxSprite {
 					applyBrush(brush);
 					drawPath(items);
 				case Text(x, y, text, color, size):
-					drawText(x, y, text, color, size);
+					drawText(Math.round(x + offset.x), Math.round(y + offset.y), text, color, size);
 			}
 		}
 	}
@@ -132,19 +136,24 @@ class VectorSprite extends FlxSprite {
 	 * Redraw sprite
 	 */
 	function redraw() {
+		var pwidth = width;
+		var pheight = height;
+
 		// Create graphic for frames
 		var w = frameNodes.length * Math.round(width);
-		makeGraphic(w, Math.round(height), FlxColor.TRANSPARENT);				
+		makeGraphic(w, Math.round(height), FlxColor.TRANSPARENT);		
 
 		for (i in 0...frameNodes.length) {
 			var frm = frameNodes[i];
-			var rect = FlxRect.get(i * width, 0, width, height);
-			frames.addSpriteSheetFrame(rect);
-			drawFrameNode(frm);
+			drawFrameNode(frm, new Point(i * pwidth, 0));
 		}
 
-		width = 100;
-		height = 100;
+		frames = FlxTileFrames.fromGraphic(graphic, FlxPoint.get(pwidth, pheight));
+		width = pwidth;
+		height = pheight;
+
+		animation.add("simple", [0, 1], 1);
+		animation.play("simple");
 	}
 
 	/**
@@ -177,10 +186,10 @@ class VectorSprite extends FlxSprite {
 	/**
 	 * Parse circle
 	 */
-	function parseCircle(elem:haxe.xml.Access):FrameItem {		
-		var x = Std.parseInt(elem.att.x);		
+	function parseCircle(elem:haxe.xml.Access):FrameItem {
+		var x = Std.parseInt(elem.att.x);
 		var y = Std.parseInt(elem.att.y);
-		var radius = Std.parseInt(elem.att.radius);		
+		var radius = Std.parseInt(elem.att.radius);
 		var brush = elem.att.brush;
 		return FrameItem.Circle(x, y, radius, brush);
 	}
@@ -263,11 +272,11 @@ class VectorSprite extends FlxSprite {
 	/**
 	 * Parse frame
 	 */
-	function parseFrame(elem:haxe.xml.Access) {		
-		var items:Array<FrameItem> = [];		
+	function parseFrame(elem:haxe.xml.Access) {
+		var items:Array<FrameItem> = [];
 		for (nod in elem.elements) {
 			switch nod.name {
-				case "rect":					
+				case "rect":
 					items.push(parseRect(nod));
 				case "circle":
 					items.push(parseCircle(nod));
@@ -278,11 +287,11 @@ class VectorSprite extends FlxSprite {
 				case "text":
 					items.push(parseText(nod));
 			}
-		}		
+		}
 
 		var node:FrameNode = {
 			items: items
-		};		
+		};
 
 		return node;
 	}
@@ -311,8 +320,8 @@ class VectorSprite extends FlxSprite {
 	 */
 	public function new(text:String) {
 		super();
-		var xml = new haxe.xml.Access(Xml.parse(text));		
-		parseXml(xml);		
+		var xml = new haxe.xml.Access(Xml.parse(text));
+		parseXml(xml);
 		redraw();
 	}
 }
