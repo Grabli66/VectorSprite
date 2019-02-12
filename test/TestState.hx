@@ -26,7 +26,9 @@ class TestState extends FlxState
 					<text x="0" y="0" text="Click!" color="FFFFFF" size="8" />
 				</frame>
 				<frame>
-					<rect x="0" y="0" width="100" height="40" brush="green" />
+					<rect x="0" y="0" width="100" height="38" brush="green" />
+					<rect x="0" y="38" width="100" height="2" brush="green2" />
+					<text x="0" y="0" text="Click!" color="FFFFFF" size="8" />
 				</frame>
 			</sprite>
 		');
