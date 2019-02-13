@@ -1,5 +1,7 @@
 package vector;
 
+import flixel.util.FlxSpriteUtil;
+import openfl.display.BlendMode;
 import flixel.FlxSprite;
 import flash.display.Sprite;
 import flash.display.Graphics;
@@ -12,6 +14,7 @@ class DrawHelper {
 	public static var flashGfx(default, null):Graphics = flashGfxSprite.graphics;
 
 	public static inline function beginFill(color:Int = 0, alpha:Float = 1):Void {
+		flashGfx.clear();
 		flashGfx.beginFill(color, alpha);
 	}
 
@@ -49,6 +52,5 @@ class DrawHelper {
 
 	public static inline function commit(sprite:FlxSprite):Void {
 		sprite.pixels.draw(flashGfxSprite);
-		sprite.dirty = true;
 	}
 }

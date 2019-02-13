@@ -1,12 +1,10 @@
 package vector;
 
+import flixel.util.FlxSpriteUtil;
+import openfl.display.BlendMode;
 import flixel.graphics.frames.FlxTileFrames;
 import flixel.math.FlxPoint;
 import openfl.geom.Point;
-import openfl.display.BitmapData;
-import flixel.graphics.FlxGraphic;
-import flixel.FlxG;
-import flixel.math.FlxRect;
 import vector.FrameNode.PathCommand;
 import vector.FrameNode.FrameItem;
 import flixel.math.FlxMatrix;
@@ -49,7 +47,7 @@ class VectorSprite extends FlxSprite {
 	/**
 	 * Draw rect
 	 */
-	function drawRect(x:Int, y:Int, width:Int, height:Int) {
+	function drawRect(x:Int, y:Int, width:Int, height:Int) {		
 		DrawHelper.drawRect(x, y, width, height);
 		DrawHelper.endFill();
 		DrawHelper.commit(this);
@@ -100,12 +98,13 @@ class VectorSprite extends FlxSprite {
 	function drawText(x:Int, y:Int, text:String, color:Int, size:Int) {
 		var flText = new FlxText();
 		flText.text = text;
+
 		flText.setFormat(null, size, color);
 		flText.drawFrame(true);
-		var matrix = new FlxMatrix();
+		var matrix = new FlxMatrix();		
 		matrix.identity();
 		matrix.translate(x, y);
-		pixels.draw(flText.pixels, matrix);
+		pixels.draw(flText.graphic.bitmap, matrix);
 	}
 
 	/**
@@ -116,10 +115,14 @@ class VectorSprite extends FlxSprite {
 			switch item {
 				case Rect(x, y, width, height, brush):
 					applyBrush(brush);
-					drawRect(Math.round(x + offset.x), Math.round(y + offset.y), width, height);
-				case Circle(x, y, radius, brush):
+					var ox = Math.round(x + offset.x);
+					var oy = Math.round(y + offset.y);					
+					drawRect(ox, oy, width, height);
+				case Circle(x, y, radius, brush):				
 					applyBrush(brush);
-					drawCircle(Math.round(x + offset.x), Math.round(y + offset.y), radius);
+					var ox = Math.round(x + offset.x);
+					var oy = Math.round(y + offset.y);
+					drawCircle(ox, oy, radius);
 				case Ellipse(x, y, width, height, brush):
 					applyBrush(brush);
 					drawEllipse(x, y, width, height);
@@ -141,11 +144,11 @@ class VectorSprite extends FlxSprite {
 
 		// Create graphic for frames
 		var w = frameNodes.length * Math.round(width);
-		makeGraphic(w, Math.round(height), FlxColor.TRANSPARENT);		
+		makeGraphic(w, Math.round(height), FlxColor.TRANSPARENT);
 
 		for (i in 0...frameNodes.length) {
 			var frm = frameNodes[i];
-			drawFrameNode(frm, new Point(i * pwidth, 0));
+			drawFrameNode(frm, new Point(i * (pwidth), 0));
 		}
 
 		frames = FlxTileFrames.fromGraphic(graphic, FlxPoint.get(pwidth, pheight));
