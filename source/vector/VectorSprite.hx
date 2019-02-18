@@ -154,9 +154,6 @@ class VectorSprite extends FlxSprite {
 		frames = FlxTileFrames.fromGraphic(graphic, FlxPoint.get(pwidth, pheight));
 		width = pwidth;
 		height = pheight;
-
-		animation.add("simple", [0, 1], 1);
-		animation.play("simple");
 	}
 
 	/**
