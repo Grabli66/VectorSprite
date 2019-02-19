@@ -100,7 +100,7 @@ class VectorSprite extends FlxSprite {
 		flText.text = text;
 
 		flText.setFormat(null, size, color);
-		flText.drawFrame(true);
+		flText.drawFrame(false);
 		var matrix = new FlxMatrix();		
 		matrix.identity();
 		matrix.translate(x, y);
@@ -144,13 +144,13 @@ class VectorSprite extends FlxSprite {
 
 		// Create graphic for frames
 		var w = frameNodes.length * Math.round(width);
-		makeGraphic(w, Math.round(height), FlxColor.TRANSPARENT);
+		makeGraphic(w, Math.round(height), FlxColor.TRANSPARENT, true);
 
 		for (i in 0...frameNodes.length) {
 			var frm = frameNodes[i];
 			drawFrameNode(frm, new Point(i * (pwidth), 0));
 		}
-
+		
 		frames = FlxTileFrames.fromGraphic(graphic, FlxPoint.get(pwidth, pheight));
 		width = pwidth;
 		height = pheight;
@@ -320,7 +320,7 @@ class VectorSprite extends FlxSprite {
 	 */
 	public function new(text:String) {
 		super();
-		var xml = new haxe.xml.Access(Xml.parse(text));
+		var xml = new haxe.xml.Access(Xml.parse(text));		
 		parseXml(xml);
 		redraw();
 	}
